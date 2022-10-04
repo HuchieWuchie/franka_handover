@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node name="receiver_estimation_node" pkg="receiver_estimation" type="locate_receiver.py" output="screen" required="true">
+    <param name = "cam_base_name" value = "test" type ="string" />
+  </node>
+
+  <node name="receiver_estimation_node2" pkg="receiver_estimation" type="locate_receiver.py" output="screen" required="true">
+    <param name = "cam_base_name" value = "test2" type ="string" />
+  </node>
+
+
+
+
+</launch>
