@@ -12,7 +12,7 @@ aluminum peripherial evaluation case.
   <xacro:macro name="sensor_d435" params="parent prefix *origin">
     <xacro:property name="M_PI" value="3.1415926535897931" />
 
-    <xacro:include filename="$(find rob10)/urdf/_d435.gazebo.xacro"/>
+    <xacro:include filename="$(find ws_description)/urdf/_d435.gazebo.xacro"/>
 
     <!-- The following values are approximate, and the camera node
      publishing TF values with actual calibrated camera extrinsic values -->
@@ -54,8 +54,8 @@ aluminum peripherial evaluation case.
       <origin xyz="${d435_cam_mount_from_center_offset} ${-d435_cam_depth_py} 0" rpy="${M_PI/2} 0 ${M_PI/2}"/>
         <geometry>
           <!-- <box size="${d435_cam_width} ${d435_cam_height} ${d435_cam_depth}"/> -->
-	  <mesh filename="package://rob10/urdf/meshes/d435.dae" />
-          <!--<mesh filename="package://rob10/urdf/meshes/d435/d435.dae" />-->
+	  <mesh filename="package://ws_description/urdf/meshes/d435.dae" />
+          <!--<mesh filename="package://ws_description/urdf/meshes/d435/d435.dae" />-->
 
         </geometry>
         <material name="aluminum"/>

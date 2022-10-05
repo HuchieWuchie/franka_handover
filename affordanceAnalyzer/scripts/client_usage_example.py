@@ -5,9 +5,9 @@ import numpy as np
 import cv2
 from cameraService.cameraClient import CameraClient
 from affordanceService.client import AffordanceClient
-from rob9Utils.visualize import visualizeMasksInRGB, visualizeBBoxInRGB
-from rob9Utils.affordancetools import getPredictedAffordances, getAffordanceContours
-from rob9Utils.utils import erodeMask, keepLargestContour, convexHullFromContours, maskFromConvexHull, thresholdMaskBySize, removeOverlapMask
+from fhUtils.visualize import visualizeMasksInRGB, visualizeBBoxInRGB
+from fhUtils.affordancetools import getPredictedAffordances, getAffordanceContours
+from fhUtils.utils import erodeMask, keepLargestContour, convexHullFromContours, maskFromConvexHull, thresholdMaskBySize, removeOverlapMask
 
 
 import open3d as o3d

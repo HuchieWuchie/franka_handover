@@ -1,6 +1,6 @@
 import sys
 import rospy
-from realsense_service.srv import *
+from fh_sensors_camera.srv import *
 import numpy as np
 import cv2
 import sensor_msgs.point_cloud2 as pc2

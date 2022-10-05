@@ -11,11 +11,11 @@ from scipy.spatial.transform import Rotation as R
 
 from affordanceService.client import AffordanceClient
 from grasp_service.client import GraspingGeneratorClient
-from rob9Utils.graspGroup import GraspGroup
-from rob9Utils.visualize import visualizeGrasps6DOF, createGripper, visualizeGripper
+from fhsUtils.graspGroup import GraspGroup
+from fhsUtils.visualize import visualizeGrasps6DOF, createGripper, visualizeGripper
 
-from rob9Utils.affordancetools import getPointCloudAffordanceMask, getPredictedAffordances, getAffordanceContours, getObjectAffordancePointCloud
-from rob9Utils.utils import erodeMask, keepLargestContour, convexHullFromContours, maskFromConvexHull, thresholdMaskBySize, removeOverlapMask
+from fhUtils.affordancetools import getPointCloudAffordanceMask, getPredictedAffordances, getAffordanceContours, getObjectAffordancePointCloud
+from fhUtils.utils import erodeMask, keepLargestContour, convexHullFromContours, maskFromConvexHull, thresholdMaskBySize, removeOverlapMask
 
 
 if __name__ == "__main__":

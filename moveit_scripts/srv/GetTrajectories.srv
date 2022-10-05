@@ -1,4 +1,0 @@
-nav_msgs/Path grasps
----
-nav_msgs/Path trajectories_poses
-moveit_scripts/RobotTrajectories trajectories

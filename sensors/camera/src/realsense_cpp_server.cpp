@@ -28,13 +28,13 @@
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "realsense_service/capture.h"
-#include "realsense_service/depth.h"
-#include "realsense_service/intrinsics.h"
+#include "fh_sensors_camera/capture.h"
+#include "fh_sensors_camera/depth.h"
+#include "fh_sensors_camera/intrinsics.h"
 // intrinsics.srv is not used
-#include "realsense_service/pointcloud.h"
-#include "realsense_service/rgb.h"
-#include "realsense_service/uvSrv.h"
+#include "fh_sensors_camera/pointcloud.h"
+#include "fh_sensors_camera/rgb.h"
+#include "fh_sensors_camera/uvSrv.h"
 
 typedef std::tuple<uint8_t, uint8_t, uint8_t> RGB_tuple;
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
@@ -82,7 +82,7 @@ class RealsenseServer{
     ros::Publisher pubRGB;
 
     //Declare services functions
-    bool serviceCaptureStatic(realsense_service::capture::Request& req, realsense_service::capture::Response& res){
+    bool serviceCaptureStatic(fh_sensors_camera::capture::Request& req, fh_sensors_camera::capture::Response& res){
       LOG("Updating statics.");
       if (req.capture.data){
         updateStatics();
@@ -94,20 +94,20 @@ class RealsenseServer{
       return true;
     }
 
-    bool serviceSendDepthImageStatic(realsense_service::depth::Request& req, realsense_service::depth::Response& res){
+    bool serviceSendDepthImageStatic(fh_sensors_camera::depth::Request& req, fh_sensors_camera::depth::Response& res){
       sensor_msgs::ImagePtr imgDepthMsg = cv_bridge::CvImage(std_msgs::Header(), "mono16", depthImageStatic).toImageMsg();
       res.img = *imgDepthMsg;
       return true;
     }
 
-    bool serviceSendRGBImageStatic(realsense_service::rgb::Request& req, realsense_service::rgb::Response& res){
+    bool serviceSendRGBImageStatic(fh_sensors_camera::rgb::Request& req, fh_sensors_camera::rgb::Response& res){
 
       sensor_msgs::ImagePtr imgColorMsg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", colorImageStatic).toImageMsg();
       res.img = *imgColorMsg;
       return true;
     }
 
-    bool serviceGetUVStatic(realsense_service::uvSrv::Request& req, realsense_service::uvSrv::Response& res){
+    bool serviceGetUVStatic(fh_sensors_camera::uvSrv::Request& req, fh_sensors_camera::uvSrv::Response& res){
       std_msgs::MultiArrayDimension uvDim1;
       uvDim1.label = "length";
       uvDim1.size = uvStatic.size();
@@ -127,7 +127,7 @@ class RealsenseServer{
       return true;
     }
 
-    bool serviceGetPointCloudStatic(realsense_service::pointcloud::Request& req, realsense_service::pointcloud::Response& res){
+    bool serviceGetPointCloudStatic(fh_sensors_camera::pointcloud::Request& req, fh_sensors_camera::pointcloud::Response& res){
 
       sensor_msgs::PointCloud2 msgPointCloud2;
 

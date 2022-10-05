@@ -19,8 +19,8 @@ from std_msgs.msg import Header, Float32
 from orientation_service.srv import runOrientationSrv, runOrientationSrvResponse
 from orientation_service.srv import setSettingsOrientationSrv, setSettingsOrientationSrvResponse
 
-from rob9Utils.affordancetools import getAffordancePointCloudBasedOnVariance, getPredictedAffordances, getAffordanceColors, getAffordanceContours, getObjectAffordancePointCloud, getAffordanceBoundingBoxes, getPredictedAffordancesInPointCloud
-from rob9Utils.utils import erodeMask, keepLargestContour, convexHullFromContours, maskFromConvexHull, thresholdMaskBySize, removeOverlapMask
+from fhUtils.affordancetools import getAffordancePointCloudBasedOnVariance, getPredictedAffordances, getAffordanceColors, getAffordanceContours, getObjectAffordancePointCloud, getAffordanceBoundingBoxes, getPredictedAffordancesInPointCloud
+from fhUtils.utils import erodeMask, keepLargestContour, convexHullFromContours, maskFromConvexHull, thresholdMaskBySize, removeOverlapMask
 
 from cameraService.cameraClient import CameraClient
 from affordanceService.client import AffordanceClient

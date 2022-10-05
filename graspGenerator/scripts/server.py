@@ -16,9 +16,9 @@ from scipy.spatial.transform import Rotation
 from std_msgs.msg import Header, Float32
 
 from grasp_generator.srv import *
-from rob9.msg import *
-from rob9.srv import *
-from rob9Utils.visualize import create_mesh_box, createGripper, visualizeGripper, visualizeFrameMesh
+from fh_utils.msg import *
+from fh_utils.srv import *
+from fhUtils.visualize import create_mesh_box, createGripper, visualizeGripper, visualizeFrameMesh
 from grasp_service.client import GraspingGeneratorClient
 from cameraService.cameraClient import CameraClient
 from scipy.spatial import distance
@@ -232,7 +232,7 @@ class GraspServer(object):
                 translation[2] = s_grasp[2] - depth_values[int(d_count / 2)]
                 #score = 1 - distance.euclidean(np.linalg.norm(translation), np.linalg.norm(centroid))
                 #translation[2] = s_grasp[2] - depth_values[min(0, d_count-1)]
-                
+
                 #vis_gripper = visualizeGripper(gripper)
                 #gripper_frame = visualizeFrameMesh(translation, eeRotMat)
                 #o3d.visualization.draw_geometries([pcd_downsample, vis_gripper, gripper_frame])

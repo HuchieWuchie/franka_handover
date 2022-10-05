@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 import rospy
 from grasp_generator.srv import *
-from rob9.msg import GraspMsg, GraspGroupMsg
-from rob9.srv import *
+from fh_utils.msg import GraspMsg, GraspGroupMsg
+from fh_utils.srv import *
 from std_msgs.msg import Float32, Int32, String
 import numpy as np
 import cv2
 import open3d as o3d
 import copy
 from cameraService.cameraClient import CameraClient
-from rob9Utils.graspGroup import GraspGroup, Grasp
+from fhUtils.graspGroup import GraspGroup, Grasp
 
 class GraspingGeneratorClient(object):
     """docstring for GraspingGeneratorClient."""

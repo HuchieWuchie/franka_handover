@@ -11,9 +11,9 @@ from cameraService.cameraClient import CameraClient
 from affordanceService.client import AffordanceClient
 from orientationService.client import OrientationClient
 
-from rob9Utils.visualize import visualizeMasksInRGB, visualizeFrameMesh
-from rob9Utils.affordancetools import getPredictedAffordances, getAffordanceContours, getObjectAffordancePointCloud
-from rob9Utils.utils import erodeMask, keepLargestContour, convexHullFromContours, maskFromConvexHull, thresholdMaskBySize, removeOverlapMask
+from fhUtils.visualize import visualizeMasksInRGB, visualizeFrameMesh
+from fhUtils.affordancetools import getPredictedAffordances, getAffordanceContours, getObjectAffordancePointCloud
+from fhUtils.utils import erodeMask, keepLargestContour, convexHullFromContours, maskFromConvexHull, thresholdMaskBySize, removeOverlapMask
 
 
 

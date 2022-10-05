@@ -54,39 +54,41 @@ panda_arm_controller:
     - panda_joint5
     - panda_joint6
     - panda_joint7
+  constraints:
+    stopped_velocity_tolerance: 0.05
   gains:
     panda_joint1:
-      p: 100
+      p: 12000
       d: 1
       i: 1
       i_clamp: 1
     panda_joint2:
-      p: 100
+      p: 18000
       d: 1
       i: 1
       i_clamp: 1
     panda_joint3:
-      p: 100
+      p: 18000
       d: 1
       i: 1
       i_clamp: 1
     panda_joint4:
-      p: 100
+      p: 12000
       d: 1
       i: 1
       i_clamp: 1
     panda_joint5:
-      p: 100
+      p: 12000
       d: 1
       i: 1
       i_clamp: 1
     panda_joint6:
-      p: 100
+      p: 7000
       d: 1
       i: 1
       i_clamp: 1
     panda_joint7:
-      p: 100
+      p: 2000
       d: 1
       i: 1
       i_clamp: 1

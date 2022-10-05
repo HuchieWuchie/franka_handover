@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<launch>
+
+  <include file="$(find panda_arm_moveit_config)/launch/bringup.launch"/>
+
+
+  <node name="tf_service_node" pkg="fh_utils" type="tf2_service.py" required="true"/>
+  <node name="moveit_service_node" pkg="fh_utils" type="moveit_service.py" required="true"/>
+
+  <node name="grasp_generator_node" pkg="grasp_generator" type="server.py" output="screen" required="true"/>
+  <node name="location_service" pkg="location_service" type="scan_processing_server" output="screen" required="true"/>
+  <node name="orientation_service" pkg="orientation_service" type="server.py" output="screen" required="true"/>
+
+  <node name="camera_robot" pkg="fh_sensors_camera" type="fh_sensors_camera_node" output="screen" required="true">
+    <param name = "cam_base_name" value = "camera_robot" type ="string" />
+  </node>
+
+  <!--
+  <node name="camera_shelf" pkg="fh_sensors_camera" type="fh_sensors_camera_node" output="screen" required="false">
+    <param name = "cam_base_name" value = "camera_shelf" type ="string" />
+  </node>
+  -->
+
+  
+  <node name="lidar_front" pkg="urg_node" type="urg_node" output="screen" required="true">
+    <remap from="/scan" to="/sensors/lidar/scan" />
+  </node>
+
+
+</launch>
