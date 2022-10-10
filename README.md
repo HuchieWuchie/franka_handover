@@ -109,7 +109,15 @@ roslaunch fh_handover fh_bringup.launch
 
 Launch whatever experiement you want, chose between the ones listed below:
 ```
-rosrun fh_handover final_test_observation.py
+rosrun fh_handover final_test_observation.py -h
+
+optional arguments:
+  -h, --help    show this help message and exit
+  --save        If enabled, saves the various outputs into a folder.
+  --visualize   If enabled, shows various blocking visualizations along the
+                way.
+  --move_robot  Enables physical movement of robot
+  --debug       Enables a bunch of print statements
 ```
 
 In order to command the robot to pick up an object you must send a command to the rostopic /objects_affordances_id. The integer id corresponds to the object classes of AffNet-DR, eg. 1 (knife), 16 (mallet), etc.
