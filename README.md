@@ -73,6 +73,7 @@ cd ros_ws/src
 
 Git clone the required repositories
 
+```
 git clone https://github.com/justagist/franka_panda_description.git
 git clone https://github.com/HuchieWuchie/AAU_franka_moveit.git
 git clone https://github.com/HuchieWuchie/franka_handover.git
