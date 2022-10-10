@@ -13,8 +13,8 @@ class LocationClient(object):
 
     def getLocation(self):
 
-        rospy.wait_for_service('/iiwa/requestReceiverPose')
-        get_receiver_pose = rospy.ServiceProxy("/iiwa/requestReceiverPose", requestReceiverPose)
+        rospy.wait_for_service('/requestReceiverPose')
+        get_receiver_pose = rospy.ServiceProxy("/requestReceiverPose", requestReceiverPose)
 
         req = Bool()
         req.data = True

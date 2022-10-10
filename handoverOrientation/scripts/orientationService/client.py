@@ -2,10 +2,11 @@
 import rospy
 from std_msgs.msg import Float32MultiArray, Int32MultiArray, Int32
 import numpy as np
-from cameraService.cameraClient import CameraClient
+#from cameraService.cameraClient import CameraClient
 from affordanceService.client import AffordanceClient
 from orientation_service.srv import runOrientationSrv, runOrientationSrvResponse
 from orientation_service.srv import setSettingsOrientationSrv, setSettingsOrientationSrvResponse
+import fhUtils.msg_helper as msg_helper
 
 class OrientationClient(object):
     """docstring for orientationClient."""
@@ -21,7 +22,7 @@ class OrientationClient(object):
         orientationService = rospy.ServiceProxy("/computation/handover_orientation/get", runOrientationSrv)
         print("Connection to orientation service established!")
 
-        camClient = CameraClient()
+        #camClient = CameraClient()
         affClient = AffordanceClient(connected = False)
 
         pcd_points = np.asanyarray(pcd_affordance.points)
@@ -30,10 +31,10 @@ class OrientationClient(object):
         if np.max(pcd_colors) <= 1:
             pcd_colors = pcd_colors * 255
 
-        pcd_geometry_msg, pcd_color_msg = camClient.packPCD(pcd_points, pcd_colors)
+        pcd_geometry_msg, pcd_color_msg = msg_helper.packPCD(pcd_points, pcd_colors, frame_id = "it_doesnt_matter")
         response = orientationService(pcd_geometry_msg, pcd_color_msg)
 
-        current_orientation, current_translation, goal_orientation = self.unpackOrientation(response.current, response.goal)
+        current_orientation, current_translation, goal_orientation = msg_helper.unpackOrientation(response.current, response.goal)
 
         del response
 
@@ -51,23 +52,3 @@ class OrientationClient(object):
 
         else:
             print("Invalid method")
-
-    def packOrientation(self, current_transformation, goal_orientation):
-
-        msg_current = Float32MultiArray()
-        current_transformation = current_transformation.flatten().tolist()
-        msg_current.data = current_transformation
-
-        msg_goal = Float32MultiArray()
-        goal_orientation = goal_orientation.flatten().tolist()
-        msg_goal.data = goal_orientation
-
-        return msg_current, msg_goal
-
-    def unpackOrientation(self, msg_current, msg_goal):
-        current_transformation = np.asarray(msg_current.data).reshape((4,4))
-        orientation = current_transformation[:3,:3]
-        translation = current_transformation[:3,3]
-
-        goal = np.asarray(msg_goal.data).reshape((3,3))
-        return orientation, translation, goal

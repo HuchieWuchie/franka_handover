@@ -10,6 +10,7 @@ import open3d as o3d
 import copy
 from cameraService.cameraClient import CameraClient
 from fhUtils.graspGroup import GraspGroup, Grasp
+import fhUtils.msg_helper as msg_helper
 
 class GraspingGeneratorClient(object):
     """docstring for GraspingGeneratorClient."""
@@ -39,40 +40,19 @@ class GraspingGeneratorClient(object):
         """
 
         print("Waiting for grasp service")
-        rospy.wait_for_service("/iiwa/grasp_generator/result")
+        rospy.wait_for_service("/grasp_generator/result")
         print("Grasp service is up, generating grasps...")
-        graspGeneratorService = rospy.ServiceProxy("/iiwa/grasp_generator/result", runGraspingSrv)
-
-        cam_client = CameraClient()
+        graspGeneratorService = rospy.ServiceProxy("/grasp_generator/result", runGraspingSrv)
 
         pcd_points = np.asanyarray(pcd_environment.points)
-        pcd_msg, _ = cam_client.packPCD(pcd_points, None)
-        grasp_points_msg, _ = cam_client.packPCD(sampled_grasp_points, None)
+        pcd_msg, _ = msg_helper.packPCD(pcd_points, None, frame_id = frame_id)
+        grasp_points_msg, _ = msg_helper.packPCD(sampled_grasp_points, None, frame_id = frame_id)
 
         response = graspGeneratorService(grasp_points_msg, pcd_msg, String(frame_id),
                                         Int32(tool_id), Int32(affordance_id),
                                         Int32(object_instance))
 
         grasps = GraspGroup().fromGraspGroupMsg(response)
-
-        return grasps
-
-    def packGrasps(self, poses, scores, frame_id, tool_id,
-                                        affordance_id, obj_inst):
-
-        grasps = []
-        for pose, score in zip(poses, scores):
-
-            grasp = Grasp(frame_id = frame_id)
-            grasp.position.set(x = pose[0], y = pose[1], z = pose[2])
-            grasp.orientation.setQuaternion(pose[3:])
-            grasp.score = score
-            grasp.tool_id = tool_id
-            grasp.affordance_id = affordance_id
-            grasp.setObjectInstance(obj_inst)
-
-            grasp_msg = grasp.toGraspMsg()
-            grasps.append(grasp_msg)
 
         return grasps
 
@@ -95,8 +75,8 @@ class GraspingGeneratorClient(object):
         self.depth_min = depth_min
         self.depth_max = depth_max
 
-        rospy.wait_for_service("/iiwa/grasp_generator/set_settings")
-        graspGeneratorService = rospy.ServiceProxy("/iiwa/grasp_generator/set_settings", setSettingsGraspingSrv)
+        rospy.wait_for_service("/grasp_generator/set_settings")
+        graspGeneratorService = rospy.ServiceProxy("/grasp_generator/set_settings", setSettingsGraspingSrv)
 
         response = graspGeneratorService(Float32(azimuth_step_size), Int32(azimuth_min), Float32(azimuth_max),
                                         Float32(polar_step_size), Int32(polar_min), Float32(polar_max),

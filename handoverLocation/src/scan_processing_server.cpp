@@ -24,7 +24,7 @@
 class ScannerServer{
   public:
     ScannerServer(){
-      sub_scan = n.subscribe("scan", 1, &ScannerServer::scanCallback, this);
+      sub_scan = n.subscribe("/sensors/lidar/scan", 1, &ScannerServer::scanCallback, this);
       pub_processed_scan =  n.advertise<sensor_msgs::LaserScan>("processed_scan", 1);
       pub_receiver_point = n.advertise<geometry_msgs::PointStamped>("receiver", 1);
       serverRequestReceiverPose = n.advertiseService("requestReceiverPose", &ScannerServer::getReceiverPose, this);
@@ -92,7 +92,7 @@ class ScannerServer{
 
      try{
        //listener.transformPoint("iiwa_link_0", laser_point, iiwa_link_0_point);
-       listener.transformPoint("iiwa_link_0", p, iiwa_link_0_point);
+       listener.transformPoint("panda_link0", p, iiwa_link_0_point);
      }
      catch(tf::TransformException& ex){
        ROS_ERROR("Received an exception trying to transform a point from \"laser\" to \"iiwa_link_0\": %s", ex.what());
@@ -112,7 +112,7 @@ class ScannerServer{
      // PUBLISH NEW FRAME
      geometry_msgs::TransformStamped giver_frame;
      giver_frame.header.stamp = ros::Time::now();
-     giver_frame.header.frame_id = "iiwa_link_0";
+     giver_frame.header.frame_id = "panda_link0";
      giver_frame.child_frame_id = "giver";
      giver_frame.transform.translation.x = 0.0f;
      giver_frame.transform.translation.y = 0.0f;

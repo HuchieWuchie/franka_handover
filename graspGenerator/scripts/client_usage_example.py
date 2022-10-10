@@ -11,8 +11,8 @@ from scipy.spatial.transform import Rotation as R
 
 from affordanceService.client import AffordanceClient
 from grasp_service.client import GraspingGeneratorClient
-from fhsUtils.graspGroup import GraspGroup
-from fhsUtils.visualize import visualizeGrasps6DOF, createGripper, visualizeGripper
+from fhUtils.graspGroup import GraspGroup
+from fhUtils.visualize import visualizeGrasps6DOF, createGripper, visualizeGripper
 
 from fhUtils.affordancetools import getPointCloudAffordanceMask, getPredictedAffordances, getAffordanceContours, getObjectAffordancePointCloud
 from fhUtils.utils import erodeMask, keepLargestContour, convexHullFromContours, maskFromConvexHull, thresholdMaskBySize, removeOverlapMask

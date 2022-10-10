@@ -27,7 +27,7 @@ import sensor_msgs.point_cloud2 as pc2
 import fhUtils.transformations as transform
 from fhUtils.graspGroup import GraspGroup
 from fhUtils.grasp import Grasp
-import fhUtils.moveit as robot
+import fhMoveitUtils.moveit_utils as robot
 from cameraService.cameraClient import CameraClient
 from affordanceService.client import AffordanceClient
 from grasp_service.client import GraspingGeneratorClient
@@ -94,6 +94,9 @@ def parse_args():
     parser.add_argument('--move_robot', dest='move',
                         help='Enables physical movement of robot',
                         action='store_true')
+    parser.add_argument('--debug', dest='debug',
+                        help='Prints a bunch of debug info',
+                        action='store_true')
 
     return parser.parse_args()
 
@@ -129,8 +132,8 @@ if __name__ == '__main__':
 
             rospy.Subscriber('objects_affordances_id', Int32MultiArray, callback )
 
-            pub_grasp = rospy.Publisher('fh_handover/results/grasp', PoseStamped, queue_size=10)
-            pub_waypoint = rospy.Publisher('fh_handover/results/waypoint', PoseStamped, queue_size=10)
+            #pub_grasp = rospy.Publisher('fh_handover/results/grasp', PoseStamped, queue_size=10)
+            #pub_waypoint = rospy.Publisher('fh_handover/results/waypoint', PoseStamped, queue_size=10)
             #pub_iiwa = rospy.Publisher('iiwa/command/JointPosition', JointPosition, queue_size=10 )
             #display_trajectory_publisher = rospy.Publisher('fh_handover/move_group/display_planned_path',
             #                                    moveit_msgs.msg.DisplayTrajectory,
@@ -139,11 +142,19 @@ if __name__ == '__main__':
 
             if args.move:
 
+                robot.setMaxVelocityScalingFactor(0.4)
+                robot.setMaxAcceleratoinScalingFactor(0.4)
+                robot.setPlanningTime(0.5)
+                robot.setNumPlanningAttempts(25)
+
                 result = robot.moveToNamed("ready")
                 result = robot.gripperClose()
                 result = robot.gripperOpen()
 
-            state_ready = robot.getCurrentState() # remove??
+            state_ready = robot.getCurrentState()
+
+            if args.debug:
+                print("[DEBUG]: State ", state, " current state: ", state_ready)
 
             print("Services init")
 
@@ -243,6 +254,9 @@ if __name__ == '__main__':
         elif state == 7:
             # post process affordance segmentation maps
 
+            if args.debug:
+                print("[DEBUG]: State", state)
+
             obj_inst_masks = masks[obj_inst]
             obj_inst_label = labels[obj_inst]
             obj_inst_bbox = bboxs[obj_inst]
@@ -306,6 +320,9 @@ if __name__ == '__main__':
             state = 8
 
         elif state == 8:
+
+            if args.debug:
+                print("[DEBUG]: State ", state)
             # transform point cloud into world coordinate frame
 
             T, transl_cam_2_world, rot_mat_cam_2_world = transform.getTransform("camera_robot_camera_color_optical_frame", "world")
@@ -323,8 +340,14 @@ if __name__ == '__main__':
 
         elif state == 9:
 
+            if args.debug:
+                print("[DEBUG]: State ", state)
+
             # Select affordance mask to compute grasps for
             observed_affordances = getPredictedAffordances(obj_inst_masks)
+
+            if args.debug:
+                print("[DEBUG]: State ", state, " sampling affordance regions...")
 
             success = []
             sampled_grasp_points = []
@@ -344,6 +367,10 @@ if __name__ == '__main__':
                 o3d.io.write_point_cloud(os.path.join(t_string, "pcd_affordance.ply"), pcd_affordance)
 
             if True in success:
+
+                if args.debug:
+                    print("[DEBUG]: State ", state, " Affordance region found.")
+                    print("[DEBUG]: State ", state, " estimating object pose")
 
                 # computing goal pose of object in world frame and
                 # current pose of object in world frame
@@ -375,19 +402,39 @@ if __name__ == '__main__':
                     np.save(os.path.join(t_string, "object_pose_world.npy"), object_pose_world)
                     cv2.imwrite(os.path.join(t_string, "img_obj_pose.png"), img_obj_pose)
 
+                if args.debug:
+                    print("[DEBUG]: State ", state, " object pose estimated.")
+                    print("[DEBUG]: State ", state, " computing handover location...")
+
                 loc_client = LocationClient()
                 goal_location_giver_original = loc_client.getLocation().flatten() # in givers frame
 
                 _, _, rot_mat_giver_2_world = transform.getTransform("giver", "world")
 
+                if args.debug:
+                    print("[DEBUG]: State ", state, " handover location found.")
+                    print("[DEBUG]: State ", state, " Generating grasps...")
+
                 # run the grasp algorithm
                 grasp_client = GraspingGeneratorClient()
+                #grasp_client.setSettings(0.05, -1.0, 1.0, # azimuth
+                #                        0.1, -0., 0., # polar
+                #                        0.0025, -0.005, 0.05) # depth
                 grasp_client.setSettings(0.05, -1.0, 1.0, # azimuth
                                         0.1, -0., 0., # polar
-                                        0.0025, -0.005, 0.05) # depth
+                                        0.0025, 0.015, 0.05) # depth
                 grasps = grasp_client.run(sampled_grasp_points, pcd_downsample,
                                             "world", req_obj_id, -1, obj_inst)
                 grasps.sortByScore()
+
+                if args.debug:
+
+                    o3d.visualization.draw_geometries([pcd, pcd_downsample])
+                    pcd_sampled_points = o3d.geometry.PointCloud()
+                    pcd_sampled_points.points = o3d.utility.Vector3dVector(sampled_grasp_points)
+                    o3d.visualization.draw_geometries([pcd, pcd_sampled_points])
+                    print("[DEBUG]: State ", state, ": Grasps ", len(grasps), " found!")
+                    print("[DEBUG]: State ", state, ": Computing trajectories...")
 
                 count_grasp = 0
                 while count_grasp < len(grasps):
@@ -397,18 +444,23 @@ if __name__ == '__main__':
                     print("=========================================")
                     print("Computing for grasp num: ", count_grasp + 1, " / ", len(grasps))
 
-                    waypoint = computeWaypoint(grasp, offset = 0.1)
+                    waypoint = computeWaypoint(grasp, offset = 0.25)
                     waypoint_msg = waypoint.toPoseMsg()
-                    pub_waypoint.publish(waypoint.toPoseStampedMsg())
+
                     valid_waypoint, state_waypoint = robot.getInverseKinematicsSolution(state_ready, waypoint_msg)
 
+                    transform.visualizeTransform(transform.poseToTransform(waypoint_msg), "Waypoint")
+                    if args.debug:
+                        print("[DEBUG]: state ", state, " valid waypoint and state_waypoint ", valid_waypoint, state_waypoint)
+
                     if valid_waypoint:
+
                         grasp_msg = grasp.toPoseMsg()
                         valid_grasp, state_grasp = robot.getInverseKinematicsSolution(state_waypoint.solution, grasp_msg)
 
+                        transform.visualizeTransform(transform.poseToTransform(grasp_msg), "Grasp")
+
                         if valid_grasp:
-                            #pub_waypoint.publish(waypoint.toPoseStampedMsg())
-                            #pub_grasp.publish(grasp.toPoseStampedMsg())
 
                             rot_range = 7
                             x_range = 5
@@ -439,12 +491,12 @@ if __name__ == '__main__':
                                     goal_location_giver = np.reshape(goal_location_giver, (3, 1))
                                     goal_location_world = transform.transformToFrame(goal_location_giver, "world", "giver")
                                     goal_location_world = np.array([goal_location_world.pose.position.x, goal_location_world.pose.position.y, goal_location_world.pose.position.z])
-                                    goal_location_world[2] = 1.2
+                                    goal_location_world[2] = 0.5
 
                                     print(x_pos, rot_num)
 
                                     goal_pose_world = np.hstack((goal_location_world.flatten(), goal_rot_quat_world))
-                                    #transform.visualizeTransform(transform.poseToTransform(goal_pose_world), "object_goal_pose")
+                                    transform.visualizeTransform(transform.poseToTransform(goal_pose_world), "object_goal_pose")
 
                                     # Compute the homegenous 4x4 transformation matrices
 
@@ -490,8 +542,8 @@ if __name__ == '__main__':
                                     if valid_handover:
 
                                         grasp_cam = copy.deepcopy(grasp)
-                                        grasp_cam.transformToFrame("ptu_camera_color_optical_frame")
-                                        img_vis_grasp = visualizeGraspInRGB(img, grasp_cam, opening = 0.12)
+                                        grasp_cam.transformToFrame("camera_robot_camera_color_optical_frame")
+                                        img_vis_grasp = visualizeGraspInRGB(img, grasp_cam, opening = 0.08)
 
                                         img_msg = br.cv2_to_imgmsg(img_vis_grasp)
                                         pub_img_grasp.publish(img_msg)
@@ -513,31 +565,36 @@ if __name__ == '__main__':
 
                                         if args.move:
                                             print("Moving to waypoint...")
-                                            #result = rob9Utils.iiwa.execute_ptp(moveit.getJointPositionAtNamed("ready").joint_position.data)
-                                            result = robot.moveToNamed("ready")
-                                            #result = robot.moveToPose()
-                                            #result = rob9Utils.iiwa.execute_ptp(state_waypoint.solution.joint_state.position[0:7])
+                                            #result = robot.moveToNamed("ready")
+
+                                            robot.setMaxVelocityScalingFactor(0.05)
+                                            robot.setMaxAcceleratoinScalingFactor(0.05)
+                                            success, trajectory = robot.planToPose(waypoint_msg)
+                                            success = robot.executeTrajectory(trajectory)
                                             rospy.sleep(1)
 
                                             print("Moving to grasp pose...")
-                                            result = rob9Utils.iiwa.execute_ptp(state_grasp.solution.joint_state.position[0:7])
+                                            success, trajectory = robot.planToPose(grasp_msg)
+                                            success = robot.executeTrajectory(trajectory)
                                             rospy.sleep(1)
 
-                                            gripper_pub.publish(close_gripper_msg)
+                                            robot.gripperClose()
                                             rospy.sleep(1)
 
                                             print("I have grasped!")
                                             print("Moving to ready...")
-                                            result = rob9Utils.iiwa.execute_ptp(state_waypoint.solution.joint_state.position[0:7])
-                                            result = rob9Utils.iiwa.execute_ptp(moveit.getJointPositionAtNamed("ready").joint_position.data)
+                                            success, trajectory = robot.planToPose(grasp_msg)
+                                            success = robot.executeTrajectory(trajectory)
+                                            result = robot.moveToNamed("ready")
 
                                             # Execute plan to handover pose
-                                            result = rob9Utils.iiwa.execute_ptp(state_handover.solution.joint_state.position[0:7])
+                                            success, trajectory = robot.planToPose(ee_pose)
+                                            success = robot.executeTrajectory(trajectory)
                                             rospy.sleep(2)
 
-                                            gripper_pub.publish(open_gripper_msg)
+                                            robot.gripperOpen()
                                             rospy.sleep(1)
-                                            result = rob9Utils.iiwa.execute_ptp(moveit.getJointPositionAtNamed("ready").joint_position.data)
+                                            result = robot.moveToNamed("ready")
                                         print("Motion complete")
                                         state = 3
 

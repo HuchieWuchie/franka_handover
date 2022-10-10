@@ -12,7 +12,7 @@ from fhUtils.srv import tf2TransformPathSrv, tf2TransformPathSrvResponse
 from fhUtils.srv import tf2GetTransformSrv, tf2GetTransformSrvResponse
 from fhUtils.srv import tf2VisualizeTransformSrv, tf2VisualizeTransformSrvResponse
 
-def visualizeTransform(transform, name):
+def visualizeTransform(transform: geometry_msgs.msg.Transform, name: str):
     """ Input:
         transform           - geometry_msgs.Transform()
         name                - string, name of transform
@@ -79,6 +79,7 @@ def transformToFramePath(path, newFrame):
 def poseToTransform(pose):
     """ Input:
         pose                - array [x, y, z, qx, qy, qz, qw]
+                                or geometry_msgs.msg.Pose
 
         Output:
         transform           - geometry_msgs.Transform()
@@ -86,14 +87,27 @@ def poseToTransform(pose):
 
     transform = Transform()
 
-    transform.translation.x = pose[0]
-    transform.translation.y = pose[1]
-    transform.translation.z = pose[2]
+    if isinstance(pose, (np.ndarray, np.generic) ):
 
-    transform.rotation.x = pose[3]
-    transform.rotation.y = pose[4]
-    transform.rotation.z = pose[5]
-    transform.rotation.w = pose[6]
+        transform.translation.x = pose[0]
+        transform.translation.y = pose[1]
+        transform.translation.z = pose[2]
+
+        transform.rotation.x = pose[3]
+        transform.rotation.y = pose[4]
+        transform.rotation.z = pose[5]
+        transform.rotation.w = pose[6]
+
+    elif isinstance(pose, geometry_msgs.msg.Pose ):
+
+        transform.translation.x = pose.position.x
+        transform.translation.y = pose.position.y
+        transform.translation.z = pose.position.z
+
+        transform.rotation.x = pose.orientation.x
+        transform.rotation.y = pose.orientation.y
+        transform.rotation.z = pose.orientation.z
+        transform.rotation.w = pose.orientation.w
 
     return transform
 

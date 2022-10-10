@@ -10,8 +10,6 @@ from fhUtils.grasp import Grasp
 from fhUtils.affordancetools import getPredictedAffordances, getAffordanceColors
 from geometry_msgs.msg import Pose
 
-def visualizeFrameRVIZ(msg: Pose, name: str):
-    todo = True
 
 
 def visualizeGrasps6DOF(pointcloud, graspGroup, color = None):
@@ -412,20 +410,20 @@ def createGripper(opening = 0.08, translation = np.zeros(3), rotation = np.ident
 
     translation = translation.flatten()
 
-    finger_width = 0.03 # x-axis, in meters 0.02
+    finger_width = 0.015 # x-axis, in meters 0.02
     finger_length = 0.02 # y-axis, in meters
-    finger_height = 0.045 # z-axis
+    finger_height = 0.043 # z-axis
     #finger_offset_z = -0.01
     #finger_offset_z = 0.015
     #finger_offset_z = 0.001
-    finger_offset_z = 0.01 # -0.0015, 0.025
+    finger_offset_z = 0.005 # friday 7 oct used to be 0.01
 
-    chasis_width = 0.04 # x-axis, in meters 0.03
-    chasis_length = 0.18 # y-axis
-    chasis_height = 0.12 # z-axis
+    chasis_width = 0.045 # x-axis, in meters 0.03
+    chasis_length = 0.21 # y-axis
+    chasis_height = 0.08 # z-axis
     chasis = create_mesh_box(chasis_width, chasis_length, chasis_height,
                             dx = -chasis_width / 2, dy = -chasis_length / 2,
-                            dz = -chasis_height -0.035)
+                            dz = -chasis_height -(finger_height)) # friday 7 oct what is -0.035 doing there?
 
     chasis_points = np.array(chasis.vertices)
     chasis_points = np.dot(rotation, chasis_points.T).T + translation
@@ -435,15 +433,15 @@ def createGripper(opening = 0.08, translation = np.zeros(3), rotation = np.ident
 
     left_finger_points = np.array([
 
-                            [-chasis_width / 2.0, (finger_width / 2) -( opening / 2), finger_offset_z],
-                            [chasis_width / 2.0, (finger_width / 2) -( opening / 2), finger_offset_z],
-                            [-chasis_width / 2.0, (finger_width / 2) -( opening / 2), -finger_offset_z - finger_height],
-                            [chasis_width / 2.0, (finger_width / 2) -( opening / 2), -finger_offset_z - finger_height],
+                            [-finger_length / 2.0, (finger_width / 2) -( opening / 2), finger_offset_z],
+                            [finger_length / 2.0, (finger_width / 2) -( opening / 2), finger_offset_z],
+                            [-finger_length / 2.0, (finger_width / 2) -( opening / 2), -finger_offset_z - finger_height],
+                            [finger_length / 2.0, (finger_width / 2) -( opening / 2), -finger_offset_z - finger_height],
 
-                            [-chasis_width / 2.0, (-finger_width / 2) -(opening / 2), finger_offset_z],
-                            [chasis_width / 2.0, (-finger_width / 2) -(opening / 2), finger_offset_z],
-                            [-chasis_width / 2.0, (-finger_width / 2) -(opening / 2), -finger_offset_z - finger_height],
-                            [chasis_width / 2.0, (-finger_width / 2) -(opening / 2), -finger_offset_z - finger_height],
+                            [-finger_length / 2.0, (-finger_width / 2) -(opening / 2), finger_offset_z],
+                            [finger_length / 2.0, (-finger_width / 2) -(opening / 2), finger_offset_z],
+                            [-finger_length / 2.0, (-finger_width / 2) -(opening / 2), -finger_offset_z - finger_height],
+                            [finger_length / 2.0, (-finger_width / 2) -(opening / 2), -finger_offset_z - finger_height],
 
 
                             ])
@@ -452,15 +450,15 @@ def createGripper(opening = 0.08, translation = np.zeros(3), rotation = np.ident
     left_finger_points = np.dot(rotation, left_finger_points.T).T + translation
     left_finger.points = o3d.utility.Vector3dVector(left_finger_points)
 
-    right_finger_points = np.array([[-chasis_width, (finger_width / 2) + (opening / 2), finger_offset_z],
-                            [chasis_width, (finger_width / 2) + (opening / 2), finger_offset_z],
-                            [-chasis_width, (finger_width / 2) + (opening / 2), -finger_offset_z - finger_height],
-                            [chasis_width, (finger_width / 2) + (opening / 2), -finger_offset_z - finger_height],
+    right_finger_points = np.array([[-finger_length / 2.0, (finger_width / 2) + (opening / 2), finger_offset_z],
+                            [finger_length / 2.0, (finger_width / 2) + (opening / 2), finger_offset_z],
+                            [-finger_length / 2.0, (finger_width / 2) + (opening / 2), -finger_offset_z - finger_height],
+                            [finger_length / 2.0, (finger_width / 2) + (opening / 2), -finger_offset_z - finger_height],
 
-                            [-chasis_width, (-finger_width / 2) + ( opening / 2), finger_offset_z],
-                            [chasis_width, (-finger_width / 2) + ( opening / 2), finger_offset_z],
-                            [-chasis_width, (-finger_width / 2) + ( opening / 2), -finger_offset_z - finger_height],
-                            [chasis_width, (-finger_width / 2) + ( opening / 2), -finger_offset_z - finger_height],
+                            [-finger_length / 2.0, (-finger_width / 2) + ( opening / 2), finger_offset_z],
+                            [finger_length / 2.0, (-finger_width / 2) + ( opening / 2), finger_offset_z],
+                            [-finger_length / 2.0, (-finger_width / 2) + ( opening / 2), -finger_offset_z - finger_height],
+                            [finger_length / 2.0, (-finger_width / 2) + ( opening / 2), -finger_offset_z - finger_height],
                             ])
 
     right_finger = o3d.geometry.PointCloud()

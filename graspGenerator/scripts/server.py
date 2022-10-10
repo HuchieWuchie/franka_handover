@@ -19,8 +19,8 @@ from grasp_generator.srv import *
 from fh_utils.msg import *
 from fh_utils.srv import *
 from fhUtils.visualize import create_mesh_box, createGripper, visualizeGripper, visualizeFrameMesh
+import fhUtils.msg_helper as msg_helper
 from grasp_service.client import GraspingGeneratorClient
-from cameraService.cameraClient import CameraClient
 from scipy.spatial import distance
 #from rob9Utils.graspGroup import GraspGroup as rob9GraspGroup
 #from rob9Utils.grasp import Grasp as rob9Grasp
@@ -71,12 +71,9 @@ class GraspServer(object):
 
     def run(self, msg):
 
-        cam_client = CameraClient()
-
-
         print("Computing...")
-        sampled_grasp_points, _ = cam_client.unpackPCD(msg.grasp_points, None)
-        pcd_env_points, _ = cam_client.unpackPCD(msg.pcd_env, None)
+        sampled_grasp_points, _ = msg_helper.unpackPCD(msg.grasp_points, None)
+        pcd_env_points, _ = msg_helper.unpackPCD(msg.pcd_env, None)
         frame_id = msg.frame_id.data
         tool_id = msg.tool_id.data
         affordance_id = msg.affordance_id.data
@@ -154,8 +151,14 @@ class GraspServer(object):
                     #world_coordinate_frame = visualizeFrameMesh(np.zeros(3),np.identity(3))
                     #o3d.visualization.draw_geometries([pcd_downsample,  vis_world_gripper, world_coordinate_frame])
 
+                    #print(y_count * x_count, y_count, x_count, polar_value, azimuth_value)
+                    gripper = createGripper(opening = 0.06, translation = translation, rotation = eeRotMat)
+                    vis_gripper = visualizeGripper(gripper)
+                    gripper_frame = visualizeFrameMesh(translation, eeRotMat)
+                    #world_coordinate_frame = visualizeFrameMesh(np.zeros(3),np.identity(3))
+                    #o3d.visualization.draw_geometries([pcd_downsample,  vis_gripper, gripper_frame])
 
-                    gripper = createGripper(opening = 0.12, translation = translation, rotation = eeRotMat)
+
                     if self.checkCollisionEnvironment(gripper, local_points) == False:
                         if self.checkCollisionEnvironment(gripper, sampled_grasp_points) == False:
                             #vis_gripper = visualizeGripper(gripper)
@@ -209,7 +212,7 @@ class GraspServer(object):
 
                     translation = s_grasp.copy()
                     translation[2] = translation[2] - depth_value
-                    gripper = createGripper(opening = 0.12, translation = translation, rotation = eeRotMat)
+                    gripper = createGripper(opening = 0.06, translation = translation, rotation = eeRotMat)
 
                     distance_left_finger, _ = neigh.kneighbors(np.reshape(gripper[1].get_center(), (1, 3)), return_distance = True)
                     distance_right_finger, _ = neigh.kneighbors(np.reshape(gripper[2].get_center(), (1, 3)), return_distance = True)
@@ -244,8 +247,8 @@ class GraspServer(object):
 
         print("Computed grasps, now sending...")
 
-        grasp_client = GraspingGeneratorClient()
-        grasp_msg = grasp_client.packGrasps(poses, scores, frame_id, tool_id,
+        #grasp_client = GraspingGeneratorClient()
+        grasp_msg = msg_helper.packGrasps(poses, scores, frame_id, tool_id,
                                             affordance_id, obj_inst)
 
         response = runGraspingSrvResponse()

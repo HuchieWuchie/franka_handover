@@ -21,10 +21,9 @@ from orientation_service.srv import setSettingsOrientationSrv, setSettingsOrient
 
 from fhUtils.affordancetools import getAffordancePointCloudBasedOnVariance, getPredictedAffordances, getAffordanceColors, getAffordanceContours, getObjectAffordancePointCloud, getAffordanceBoundingBoxes, getPredictedAffordancesInPointCloud
 from fhUtils.utils import erodeMask, keepLargestContour, convexHullFromContours, maskFromConvexHull, thresholdMaskBySize, removeOverlapMask
+import fhUtils.msg_helper as msg_helper
 
-from cameraService.cameraClient import CameraClient
 from affordanceService.client import AffordanceClient
-from orientationService.client import OrientationClient
 
 def signal_handler(signal, frame):
     print("Shutting down program.")
@@ -723,8 +722,8 @@ class OrientationServer(object):
 
         print("received request...")
 
-        camClient = CameraClient()
-        pcd_geometry, pcd_color = camClient.unpackPCD(msg_geometry = msg.pcd_geometry,
+        #camClient = CameraClient()
+        pcd_geometry, pcd_color = msg_helper.unpackPCD(msg_geometry = msg.pcd_geometry,
                                                     msg_color = msg.pcd_color)
 
         pcd_affordance = o3d.geometry.PointCloud()
@@ -742,8 +741,8 @@ class OrientationServer(object):
         np.set_printoptions(suppress=True)
 
         msg = runOrientationSrvResponse()
-        rotClient = OrientationClient()
-        msg.current, msg.goal = rotClient.packOrientation(T, G)
+        #rotClient = OrientationClient()
+        msg.current, msg.goal = msg_helper.packOrientation(T, G)
 
         return msg
 
