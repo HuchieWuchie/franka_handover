@@ -444,7 +444,7 @@ if __name__ == '__main__':
                     print("=========================================")
                     print("Computing for grasp num: ", count_grasp + 1, " / ", len(grasps))
 
-                    waypoint = computeWaypoint(grasp, offset = 0.25)
+                    waypoint = computeWaypoint(grasp, offset = 0.1)
                     waypoint_msg = waypoint.toPoseMsg()
 
                     valid_waypoint, state_waypoint = robot.getInverseKinematicsSolution(state_ready, waypoint_msg)
@@ -585,7 +585,7 @@ if __name__ == '__main__':
                                             print("Moving to ready...")
                                             success, trajectory = robot.planToPose(grasp_msg)
                                             success = robot.executeTrajectory(trajectory)
-                                            result = robot.moveToNamed("ready")
+                                            result = robot.moveToNamed("camera_ready_1")
 
                                             # Execute plan to handover pose
                                             success, trajectory = robot.planToPose(ee_pose)
@@ -594,7 +594,7 @@ if __name__ == '__main__':
 
                                             robot.gripperOpen()
                                             rospy.sleep(1)
-                                            result = robot.moveToNamed("ready")
+                                            result = robot.moveToNamed("camera_ready_1")
                                         print("Motion complete")
                                         state = 3
 

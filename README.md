@@ -107,9 +107,15 @@ sudo chmod a+rw /dev/ttyACM0
 roslaunch fh_handover fh_bringup.launch
 ```
 
-Launch whatever experiement you want, chose between the ones listed below:
+Launch whatever script you want, chose between the ones listed below:
+
 ```
-rosrun fh_handover final_test_observation.py -h
+rosrun fh_handover read_sensors.py
+```
+
+
+```
+rosrun fh_handover demo_full.py -h
 
 optional arguments:
   -h, --help    show this help message and exit
