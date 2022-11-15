@@ -21,7 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## OPENCV
-find_package(OpenCV)
+find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 ## REALSENSE STUFF

@@ -3,7 +3,7 @@ import rospy
 import numpy as np
 from geometry_msgs.msg import Pose, PoseStamped
 from std_msgs.msg import String, Float32, Int32, Header
-from fhUtils.msg import GraspMsg
+from fh_utils.msg import GraspMsg
 import fhUtils.transformations as transform
 
 class Position(object):

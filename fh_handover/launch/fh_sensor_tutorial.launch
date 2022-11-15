@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node name="location_service" pkg="location_service" type="scan_processing_server" output="screen" required="true"/>
+  
+  <node name="camera_robot" pkg="fh_sensors_camera" type="fh_sensors_camera_node" output="screen" required="true">
+    <param name = "cam_base_name" value = "camera_robot" type ="string" />
+  </node>
+
+  <!--
+  <node name="camera_shelf" pkg="fh_sensors_camera" type="fh_sensors_camera_node" output="screen" required="false">
+    <param name = "cam_base_name" value = "camera_shelf" type ="string" />
+  </node>
+  -->
+
+
+  <node name="lidar_front" pkg="urg_node" type="urg_node" output="screen" required="true">
+    <remap from="/scan" to="/sensors/lidar/scan" />
+  </node>
+
+</launch>

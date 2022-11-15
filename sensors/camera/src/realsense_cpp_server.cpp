@@ -240,6 +240,7 @@ std::vector<float> RealsenseServer::getCloudColor(const rs2::texture_coordinate*
 
 void RealsenseServer::update(){
     ros::Time time_now = ros::Time::now();
+
     rs2::frameset frames = pipe.wait_for_frames();
 
     if (frames){
@@ -349,7 +350,7 @@ int main(int argc, char **argv)
 
     camera.update();
     //camera.publishPointcloud();
-    camera.publishRGB();
+    //camera.publishRGB();
     ros::spinOnce();
     loop_rate.sleep();
   }

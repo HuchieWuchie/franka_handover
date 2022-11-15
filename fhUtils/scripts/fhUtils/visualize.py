@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 import open3d as o3d
 from affordanceService.client import AffordanceClient
-from fhUtils.msg import *
+from fh_utils.msg import *
 from fhUtils.graspGroup import GraspGroup
 from fhUtils.grasp import Grasp
 from fhUtils.affordancetools import getPredictedAffordances, getAffordanceColors

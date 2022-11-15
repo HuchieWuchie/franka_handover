@@ -4,8 +4,8 @@ import numpy as np
 import cv2
 from geometry_msgs.msg import Pose, Pose
 from std_msgs.msg import String, Float32, Int32, Header
-from fhUtils.msg import GraspMsg, GraspGroupMsg
-from fhUtils.srv import graspGroupSrv, graspGroupSrvResponse
+from fh_utils.msg import GraspMsg, GraspGroupMsg
+from fh_utils.srv import graspGroupSrv, graspGroupSrvResponse
 from fhUtils.grasp import Grasp
 
 class GraspGroup(object):
